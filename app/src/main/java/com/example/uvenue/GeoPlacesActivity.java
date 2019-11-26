@@ -41,7 +41,7 @@ public class GeoPlacesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places);
         //start service to determine current location
-        startService(new Intent(this, LocationService.class));
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("LocationUpdates"));
 
         rv = findViewById(R.id.venueList);

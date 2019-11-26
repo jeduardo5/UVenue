@@ -19,9 +19,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.List;
+
 public class LocationService extends Service {
     private static final String TAG = "LocationService";
     private LocationManager mLocationManager = null;
+    private String locationProvider;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
@@ -32,13 +35,15 @@ public class LocationService extends Service {
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
-            mLastLatLng = new LatLng(mLastLocation);
+            mLastLatLng = null;
         }
 
         @Override
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
+            mLastLatLng = new LatLng(mLastLocation);
+            sendLocationMessage(mLastLocation, mLastLatLng);
         }
 
         @Override
@@ -58,7 +63,9 @@ public class LocationService extends Service {
     }
 
     LocationListener[] mLocationListeners = new LocationListener[]{
-            new LocationListener(LocationManager.PASSIVE_PROVIDER)
+            new LocationListener(LocationManager.PASSIVE_PROVIDER),
+                    new LocationListener(LocationManager.GPS_PROVIDER),
+            new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
 
     @Override
@@ -79,14 +86,16 @@ public class LocationService extends Service {
         Log.e(TAG, "onCreate");
 
         initializeLocationManager();
+        initLocation();
 
         try {
             mLocationManager.requestLocationUpdates(
-                    LocationManager.PASSIVE_PROVIDER,
+                    locationProvider,
                     LOCATION_INTERVAL,
                     LOCATION_DISTANCE,
                     mLocationListeners[0]
             );
+
             //send broadcast message for location updates
             sendLocationMessage(mLocationListeners[0].mLastLocation,mLocationListeners[0].mLastLatLng);
         } catch (java.lang.SecurityException ex) {
@@ -104,7 +113,9 @@ public class LocationService extends Service {
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
                     mLocationManager.removeUpdates(mLocationListeners[i]);
@@ -120,6 +131,21 @@ public class LocationService extends Service {
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
+    }
+
+    private void initLocation() {
+        if(mLocationManager != null){
+            List<String> providers = mLocationManager.getProviders(true);
+
+            if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
+                locationProvider = LocationManager.NETWORK_PROVIDER;
+            } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
+                locationProvider = LocationManager.GPS_PROVIDER;
+            } else {
+                locationProvider = LocationManager.PASSIVE_PROVIDER;
+            }
+        }
+
     }
 
     private void sendLocationMessage(Location location, LatLng ll){
