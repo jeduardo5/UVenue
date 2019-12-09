@@ -80,7 +80,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
 
 //        // Sets the proper rating colour, referenced from the Foursquare Brand Guide
-        double ratingRaw = results.get(position).venue.rating;
+        double ratingRaw = results.get(position).getVenue().getRating();
 //        if (ratingRaw >= 9.0) {
 //            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQKale));
 //        } else if (ratingRaw >= 8.0) {
@@ -98,15 +98,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 //        }
 
         // Sets each view with the appropriate venue details
-        holder.name.setText(results.get(position).venue.venueName);
-        holder.address.setText(results.get(position).venue.location.address);
+        holder.name.setText(results.get(position).getVenue().getName());
+        holder.address.setText(results.get(position).getVenue().getLocation().getAddress());
         holder.rating.setText(Double.toString(ratingRaw));
-        holder.distance.setText(results.get(position).venue.location.distance + "m");
+        holder.distance.setText(Integer.toString(results.get(position).getVenue().getLocation().getDistance()) + "m");
 
         // Stores additional venue details for the map view
-        holder.id = results.get(position).venue.venueId;
-        holder.latitude = results.get(position).venue.location.lat;
-        holder.longitude = results.get(position).venue.location.lng;
+        holder.id = results.get(position).getVenue().getId();
+        holder.latitude = results.get(position).getVenue().getLocation().getLat();
+        holder.longitude = results.get(position).getVenue().getLocation().getLng();
     }
 
     @Override
