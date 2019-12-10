@@ -25,8 +25,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // The list of results from the Foursquare API
     private List<VenueModel> results;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder //implements View.OnClickListener {
-    {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
         // The venue fields to display
         TextView name;
         TextView address;
@@ -47,22 +47,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             distance = (TextView)v.findViewById(R.id.placePickerItemDistance);
         }
 
-//        @Override
-//        public void onClick(View v) {
-//
-//            // Creates an intent to direct the user to a map view
-//            Context context = name.getContext();
-//            Intent i = new Intent(context, MapsActivity.class);
-//
-//            // Passes the crucial venue details onto the map view
-//            i.putExtra("name", name.getText());
-//            i.putExtra("ID", id);
-//            i.putExtra("latitude", latitude);
-//            i.putExtra("longitude", longitude);
-//
-//            // Transitions to the map view.
-//            context.startActivity(i);
-//        }
+        @Override
+        public void onClick(View v) {
+
+            // Creates an intent to direct the user to a map view
+            Context context = name.getContext();
+            Intent i = new Intent(context, MapsActivity.class);
+
+            // Passes the crucial venue details onto the map view
+            i.putExtra("name", name.getText());
+            i.putExtra("ID", id);
+            i.putExtra("latitude", latitude);
+            i.putExtra("longitude", longitude);
+
+            // Transitions to the map view.
+            context.startActivity(i);
+        }
     }
 
     public RecyclerViewAdapter(Context context, List<VenueModel> results) {

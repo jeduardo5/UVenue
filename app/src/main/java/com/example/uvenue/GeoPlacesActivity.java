@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,10 +20,13 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
-
-import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.util.List;
 
@@ -30,11 +34,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GeoPlacesActivity extends Activity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class GeoPlacesActivity extends FragmentActivity
+        implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnInfoWindowClickListener{
 
     // The client object for connecting to the Google API
     private GoogleApiClient mGoogleApiClient;
+
+    private GoogleMap mMap;
 
     //
     private final String TAG = "GeoPlacesActivity";
@@ -78,6 +88,11 @@ public class GeoPlacesActivity extends Activity
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         // Gets the stored Foursquare API client ID and client secret from XML
         foursquareClientID = getResources().getString(R.string.foursquare_client_id);
@@ -143,6 +158,25 @@ public class GeoPlacesActivity extends Activity
                 finish();
             }
         }
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
+
+        com.google.android.gms.maps.model.LatLng zone1 = new LatLng(33.7891582, -84.38493509999999);
+
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(zone1).zoom(12).build();
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
     @Override
