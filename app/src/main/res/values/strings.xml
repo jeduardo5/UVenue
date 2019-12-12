@@ -2,5 +2,6 @@
     <string name="app_name">UVenue</string>
     <string name="foursquare_client_id">TGRD1ZUFQXDXUFZA55CE2MI4FFIYLJWNVIEVWYI1CARN4Z4R</string>
     <string name="foursquare_client_secret">TO0HASRTG2XPNXK2XRXXLEHZGKNAC542MXDJERWL13Z03AXU</string>
+    <string name="google_maps_key">AIzaSyB3mFPFEatxBfV79I1wDjV77DIMTGcvxYo</string>
 
 </resources>

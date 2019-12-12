@@ -38,7 +38,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         public ViewHolder(View v) {
             super(v);
-          //  v.setOnClickListener(this);
+            v.setOnClickListener(this);
 
             // Gets the appropriate view for each venue detail
             name = (TextView)v.findViewById(R.id.placePickerItemName);
@@ -52,7 +52,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             // Creates an intent to direct the user to a map view
             Context context = name.getContext();
-            Intent i = new Intent(context, MapsActivity.class);
+            Intent i = new Intent(context, GeoPlacesActivity.class);
 
             // Passes the crucial venue details onto the map view
             i.putExtra("name", name.getText());

@@ -50,6 +50,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.logo1:
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Intent i = new Intent(getApplicationContext(), GeoPlacesActivity.class);
+                    i.putExtra("name", "Current Location");
+                    i.putExtra("ID", 000);
+                    i.putExtra("latitude", 33.7891582);
+                    i.putExtra("longitude", -84.38493509999999);
                     startActivity(i);
                 } else {
                     // Notifies the user if there are insufficient location permissions
@@ -58,6 +62,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.logo2:
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Intent i = new Intent(getApplicationContext(), GeoPlacesActivity.class);
+                    i.putExtra("name", "Current Location");
+                    i.putExtra("ID", 000);
+                    i.putExtra("latitude", 33.7891582);
+                    i.putExtra("longitude", -84.38493509999999);
                     startActivity(i);
                 } else {
                     // Notifies the user if there are insufficient location permissions

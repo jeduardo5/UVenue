@@ -1,8 +1,10 @@
 package com.example.uvenue;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -57,7 +61,8 @@ public class GeoPlacesActivity extends FragmentActivity
     // The base URL for the Foursquare API
     private String foursquareBaseURL = "https://api.foursquare.com/v2/";
 
-    // The client ID and client secret for authenticating with the Foursquare API
+    // The client ID and client secret for
+    // authenticating with the Foursquare API
     private String foursquareClientID;
     private String foursquareClientSecret;
     private final static String DATE = "20191101";
@@ -65,6 +70,14 @@ public class GeoPlacesActivity extends FragmentActivity
     private RetrofitInterface retrofitInterface;
 
     private String ll;
+    Location mCurrentLocation = null;
+
+
+    // The details of the venue that is being displayed.
+    private String venueID;
+    private String venueName;
+    private double venueLatitude;
+    private double venueLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +106,14 @@ public class GeoPlacesActivity extends FragmentActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // Retrieves venues details from the intent sent from PlacePickerActivity
+        Bundle venue = getIntent().getExtras();
+        venueID = venue.getString("ID");
+        venueName = venue.getString("name");
+        venueLatitude = venue.getDouble("latitude");
+        venueLongitude = venue.getDouble("longitude");
+        setTitle(venueName);
 
         // Gets the stored Foursquare API client ID and client secret from XML
         foursquareClientID = getResources().getString(R.string.foursquare_client_id);
@@ -171,11 +192,45 @@ public class GeoPlacesActivity extends FragmentActivity
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        com.google.android.gms.maps.model.LatLng zone1 = new LatLng(33.7891582, -84.38493509999999);
+//        // setup map fragment venue location view
+        LatLng venue;
+//        if (mCurrentLocation == null){
+//            mCurrentLocation = ml);
+//            venue = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+//        } else {
+            venue = new LatLng(venueLatitude, venueLongitude);
+//        }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(zone1).zoom(12).build();
+        //add marker to map
+        Marker marker  = mMap.addMarker(new MarkerOptions()
+        .position(venue)
+        .title(venueName)
+        .snippet("Click to check this venue out!!!"));
 
+        //show marker info
+        marker.showInfoWindow();
+
+        //animate camera to view marker
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(venue).zoom(12).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        // Opens the Foursquare venue page when a user clicks on the info window of the venue
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com/v/" + venueID));
+        startActivity(browserIntent);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        //show marker info
+        marker.showInfoWindow();
+
+        return true;
 
     }
 
