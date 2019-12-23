@@ -23,7 +23,12 @@ public interface RetrofitInterface {
      * @return List of @ApiJSON
      */
     @GET("v2/venues/explore?v=20191101")
-    Call<ApiJSON> getAllNearbyVenues(@Query("near") String near);
+    Call<ApiJSON> getAllNearbyVenues(@Query("near") String near,
+                                     @Query("query") String query,
+                                     @Query("client_id") String client_id,
+                                     @Query("client_secret") String client_secret,
+                                     @Query("v") String date
+                                     );
 
     /**
      * This will show venues near your current latitude and longitude

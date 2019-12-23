@@ -1,11 +1,13 @@
 package com.example.uvenue;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NavUtils;
@@ -14,10 +16,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GeoPlacesActivity extends FragmentActivity
+public class QueryPlacesActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
@@ -78,6 +76,9 @@ public class GeoPlacesActivity extends FragmentActivity
     private String venueName;
     private double venueLatitude;
     private double venueLongitude;
+    private String query;
+    private String near;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +114,8 @@ public class GeoPlacesActivity extends FragmentActivity
         venueName = venue.getString("name");
         venueLatitude = venue.getDouble("latitude");
         venueLongitude = venue.getDouble("longitude");
+        query = venue.getString("query");
+        near = venue.getString("location");
         setTitle(venueName);
 
         // Gets the stored Foursquare API client ID and client secret from XML
@@ -142,8 +145,8 @@ public class GeoPlacesActivity extends FragmentActivity
             if (mLastLocation != null) {
                 ll = mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude();
                 retrofitInterface = RetrofitInstance.getRetrofitInstance().create(RetrofitInterface.class);
-                Call<ApiJSON> venueCall = retrofitInterface.getLatLngNearbyVenues(ll, foursquareClientID, foursquareClientSecret, DATE);
-//                Call<ApiJSON> venueCall = retrofitInterface.getAllPhillyVenues(foursquareClientID, foursquareClientSecret, DATE );
+//                Call<ApiJSON> venueCall = retrofitInterface.getLatLngNearbyVenues(ll, foursquareClientID, foursquareClientSecret, DATE);
+                Call<ApiJSON> venueCall = retrofitInterface.getAllNearbyVenues(near, query, foursquareClientID, foursquareClientSecret, DATE );
                 venueCall.enqueue(new Callback<ApiJSON>() {
                     @Override
                     public void onResponse(Call<ApiJSON> call, Response<ApiJSON> response) {

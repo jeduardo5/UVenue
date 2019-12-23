@@ -1,12 +1,14 @@
 package com.example.uvenue;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -18,9 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int ACCESS_LOCATION_PERMISSION = 1;
     private ImageView currentLocationImg;
+    private ImageView queryLocationImg;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,9 +36,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
 
+
         // Attaches a listener for onclick actions
         currentLocationImg = findViewById(R.id.logo1);
+        queryLocationImg = findViewById(R.id.logo2);
         currentLocationImg.setOnClickListener(this);
+        queryLocationImg.setOnClickListener(this);
     }
 
     @Override
@@ -61,16 +67,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
             case R.id.logo2:
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    Intent i = new Intent(getApplicationContext(), GeoPlacesActivity.class);
-                    i.putExtra("name", "Current Location");
-                    i.putExtra("ID", 000);
-                    i.putExtra("latitude", 33.7891582);
-                    i.putExtra("longitude", -84.38493509999999);
-                    startActivity(i);
+                  openDialog();
                 } else {
                     // Notifies the user if there are insufficient location permissions
                     Toast.makeText(getApplicationContext(), "Missing permissions to access your location!", Toast.LENGTH_LONG).show();
                 }
         }
+    }
+
+    public void openDialog() {
+        VenueQueryDialog queryDialog = new VenueQueryDialog();
+        queryDialog.show(getSupportFragmentManager(), "Query Dialog");
     }
 }

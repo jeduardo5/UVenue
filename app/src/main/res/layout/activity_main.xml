@@ -22,13 +22,13 @@
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/logo1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="115dp"
+                android:layout_height="96dp"
+                android:layout_centerInParent="true"
                 android:layout_marginTop="125dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 android:src="@drawable/hiclipart" />
         </RelativeLayout>
 
@@ -44,13 +44,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/topLayout">
+
         <ImageView
             android:id="@+id/logo2"
-            android:src="@drawable/kisspng"
-            android:layout_width="150dp"
-            android:layout_height="358dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
+            android:layout_width="77dp"
+            android:layout_height="248dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/kisspng" />
     </RelativeLayout>
     </LinearLayout>
 
