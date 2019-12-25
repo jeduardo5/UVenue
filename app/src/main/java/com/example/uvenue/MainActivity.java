@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, ACCESS_LOCATION_PERMISSION);
         }
 
-
-
         // Attaches a listener for onclick actions
         currentLocationImg = findViewById(R.id.logo1);
         queryLocationImg = findViewById(R.id.logo2);

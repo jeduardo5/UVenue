@@ -33,8 +33,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         TextView rating;
         TextView distance;
         String id;
+        String near;
+        String query;
         double latitude;
         double longitude;
+
 
         public ViewHolder(View v) {
             super(v);

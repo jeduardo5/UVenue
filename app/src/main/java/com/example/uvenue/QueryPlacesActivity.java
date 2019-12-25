@@ -5,8 +5,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,10 +53,15 @@ public class QueryPlacesActivity extends FragmentActivity
     //
     private final String TAG = "GeoPlacesActivity";
 
-    // The RecyclerView and associated objects for displaying the nearby coffee spots
+    // The RecyclerView and associated objects for displaying the venues
     private RecyclerView rv;
     private LinearLayoutManager rvManager;
     private RecyclerView.Adapter rvAdapter;
+    private TextView placesTitle;
+
+    // This is necessary to save and store the state of the recycler view
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mListState;
 
     // The base URL for the Foursquare API
     private String foursquareBaseURL = "https://api.foursquare.com/v2/";
@@ -67,8 +74,9 @@ public class QueryPlacesActivity extends FragmentActivity
 
     private RetrofitInterface retrofitInterface;
 
-    private String ll;
+    private String ll = null;
     Location mCurrentLocation = null;
+
 
 
     // The details of the venue that is being displayed.
@@ -89,6 +97,7 @@ public class QueryPlacesActivity extends FragmentActivity
 
         // The visible TextView and RecyclerView objects
         rv = (RecyclerView)findViewById(R.id.venueList);
+        placesTitle = findViewById(R.id.placesRecyclerTitle);
 
         // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
         rv = findViewById(R.id.venueList);
@@ -116,12 +125,21 @@ public class QueryPlacesActivity extends FragmentActivity
         venueLongitude = venue.getDouble("longitude");
         query = venue.getString("query");
         near = venue.getString("location");
+        placesTitle.setText(query +" "+ "Venues");
         setTitle(venueName);
 
         // Gets the stored Foursquare API client ID and client secret from XML
         foursquareClientID = getResources().getString(R.string.foursquare_client_id);
         foursquareClientSecret = getResources().getString(R.string.foursquare_client_secret);
     }
+
+//    protected void onSaveInstanceState(Bundle state) {
+//        super.onSaveInstanceState(state);
+//
+//        // Save list state
+//        mListState = mLayoutManager.onSaveInstanceState();
+//        state.putParcelable(LIST_STATE_KEY, mListState);
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -142,11 +160,11 @@ public class QueryPlacesActivity extends FragmentActivity
             // Makes a Google API request for the user's last known location
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-            if (mLastLocation != null) {
+            if (mLastLocation != null && near == null) {
                 ll = mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude();
                 retrofitInterface = RetrofitInstance.getRetrofitInstance().create(RetrofitInterface.class);
 //                Call<ApiJSON> venueCall = retrofitInterface.getLatLngNearbyVenues(ll, foursquareClientID, foursquareClientSecret, DATE);
-                Call<ApiJSON> venueCall = retrofitInterface.getAllNearbyVenues(near, query, foursquareClientID, foursquareClientSecret, DATE );
+                Call<ApiJSON> venueCall = retrofitInterface.getAllNearbyVenues(near, ll,  query, foursquareClientID, foursquareClientSecret, DATE );
                 venueCall.enqueue(new Callback<ApiJSON>() {
                     @Override
                     public void onResponse(Call<ApiJSON> call, Response<ApiJSON> response) {
@@ -246,6 +264,12 @@ public class QueryPlacesActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        // restore RecyclerView state
+        if (mListState != null) {
+            Parcelable mState = mListState.getParcelable(KEY_RECYCLER_STATE);
+            rv.getLayoutManager().onRestoreInstanceState(mState);
+        }
         // Do Something
         mGoogleApiClient.connect();
     }
@@ -253,6 +277,11 @@ public class QueryPlacesActivity extends FragmentActivity
     @Override
     protected void onPause() {
         super.onPause();
+        // save RecyclerView state
+        mListState = new Bundle();
+        Parcelable mState = rv.getLayoutManager().onSaveInstanceState();
+        mListState.putParcelable(KEY_RECYCLER_STATE, mState);
+
         //Do Something
         mGoogleApiClient.disconnect();
     }

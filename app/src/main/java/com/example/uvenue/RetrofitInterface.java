@@ -24,6 +24,7 @@ public interface RetrofitInterface {
      */
     @GET("v2/venues/explore?v=20191101")
     Call<ApiJSON> getAllNearbyVenues(@Query("near") String near,
+                                     @Query("ll") String ll,
                                      @Query("query") String query,
                                      @Query("client_id") String client_id,
                                      @Query("client_secret") String client_secret,
