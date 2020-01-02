@@ -160,7 +160,7 @@ public class QueryPlacesActivity extends FragmentActivity
             // Makes a Google API request for the user's last known location
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-            if (mLastLocation != null && near == null) {
+            if (mLastLocation != null || near != null) {
                 ll = mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude();
                 retrofitInterface = RetrofitInstance.getRetrofitInstance().create(RetrofitInterface.class);
 //                Call<ApiJSON> venueCall = retrofitInterface.getLatLngNearbyVenues(ll, foursquareClientID, foursquareClientSecret, DATE);

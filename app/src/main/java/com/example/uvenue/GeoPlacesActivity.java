@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -57,6 +58,10 @@ public class GeoPlacesActivity extends FragmentActivity
     private RecyclerView rv;
     private LinearLayoutManager rvManager;
     private RecyclerView.Adapter rvAdapter;
+
+    // This is necessary to save and store the state of the recycler view
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mListState;
 
     // The base URL for the Foursquare API
     private String foursquareBaseURL = "https://api.foursquare.com/v2/";
@@ -243,6 +248,12 @@ public class GeoPlacesActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        // restore RecyclerView state
+        if (mListState != null) {
+            Parcelable mState = mListState.getParcelable(KEY_RECYCLER_STATE);
+            rv.getLayoutManager().onRestoreInstanceState(mState);
+        }
         // Do Something
         mGoogleApiClient.connect();
     }
@@ -250,6 +261,11 @@ public class GeoPlacesActivity extends FragmentActivity
     @Override
     protected void onPause() {
         super.onPause();
+        // save RecyclerView state
+        mListState = new Bundle();
+        Parcelable mState = rv.getLayoutManager().onSaveInstanceState();
+        mListState.putParcelable(KEY_RECYCLER_STATE, mState);
+
         //Do Something
         mGoogleApiClient.disconnect();
     }
