@@ -16,8 +16,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Parcelable;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -33,6 +39,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -57,7 +65,7 @@ public class GeoPlacesActivity extends FragmentActivity
     // The RecyclerView and associated objects for displaying the nearby coffee spots
     private RecyclerView rv;
     private LinearLayoutManager rvManager;
-    private RecyclerView.Adapter rvAdapter;
+    private RecyclerViewAdapter rvAdapter;
 
     // This is necessary to save and store the state of the recycler view
     private final String KEY_RECYCLER_STATE = "recycler_state";
@@ -76,6 +84,7 @@ public class GeoPlacesActivity extends FragmentActivity
 
     private String ll;
     Location mCurrentLocation = null;
+    ArrayList<VenueModel> venues;
 
 
     // The details of the venue that is being displayed.
@@ -138,6 +147,29 @@ public class GeoPlacesActivity extends FragmentActivity
     @Override
     public void onConnected(Bundle connectionHint) {
 
+        final EditText editText = findViewById(R.id.searchview);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                hideKeyboard();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                hideKeyboard();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString());
+                hideKeyboard();
+            }
+            private void hideKeyboard(){
+                InputMethodManager img = (InputMethodManager)
+                        getSystemService(INPUT_METHOD_SERVICE);
+                img.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            }
+        });
         // Checks for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
@@ -165,6 +197,7 @@ public class GeoPlacesActivity extends FragmentActivity
                         ApiResponse rf = rjson.response;
                         Groups rfs = (Groups) rf.getGroups().get(0);
                         List<VenueModel> venueData = rfs.getItems();
+                        venues = new ArrayList<>(venueData);
 
                         //Display results in our recyclerview
                         rvAdapter = new RecyclerViewAdapter(getApplicationContext(), venueData);
@@ -277,6 +310,18 @@ public class GeoPlacesActivity extends FragmentActivity
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Toast.makeText(getApplicationContext(), "We can't connect to Google's servers!", Toast.LENGTH_LONG).show();
         finish();
+    }
+
+    private void filter(String text){
+        ArrayList<VenueModel> filterList = new ArrayList<>();
+
+        for (VenueModel v : venues) {
+            if(v.getVenue().getName().toLowerCase().contains(text.toLowerCase())) {
+                filterList.add(v);
+            }
+        }
+
+        rvAdapter.filterList(filterList);
     }
 
 }
